@@ -71,6 +71,8 @@ def fetch_questions_from_supabase(limit=500):
     key = os.environ.get('SUPABASE_KEY')
     if not url or not key:
         raise RuntimeError('SUPABASE_URL and SUPABASE_KEY must be set in environment')
+    if key.startswith('sb_publishable_'):
+        raise RuntimeError('SUPABASE_KEY is a publishable key; use the secret key from Supabase Secrets (sb_secret_...) in Render environment variables to read the questions table.')
 
     # Ensure URL does not end with a slash
     url = url.rstrip('/')
