@@ -81,9 +81,16 @@ def fetch_questions_from_supabase(limit=500):
         'Accept': 'application/json'
     }
     resp = requests.get(endpoint, headers=headers, timeout=15)
+    # Log status and number of items to help diagnose RLS/permission issues in hosted logs
+    try:
+        data = resp.json()
+        print(f"Supabase: status={resp.status_code}, items={len(data)}")
+    except Exception:
+        print(f"Supabase: status={resp.status_code}, body_len={len(resp.content)}")
+
     if resp.status_code != 200:
         raise RuntimeError(f"Supabase request failed: {resp.status_code} {resp.text}")
-    return resp.json()
+    return data
 
 
 @app.route('/health')
