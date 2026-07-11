@@ -85,6 +85,30 @@ def fetch_questions_from_supabase(limit=500):
         raise RuntimeError(f"Supabase request failed: {resp.status_code} {resp.text}")
     return resp.json()
 
+
+@app.route('/health')
+def health():
+    """Simple health check that tests Supabase read access."""
+    try:
+        questions = fetch_questions_from_supabase(limit=1)
+        return jsonify({"status": "ok", "available_questions": len(questions)})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@app.route('/debug-questions')
+def debug_questions():
+    """Return a small JSON sample of questions for debugging (not paginated)."""
+    try:
+        qs = fetch_questions_from_supabase(limit=20)
+        # Only return select fields to keep payload small
+        out = [{
+            'id': q.get('id'), 'question': q.get('question'), 'cop': q.get('cop')
+        } for q in qs]
+        return jsonify(out)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 def is_conflicting_explanation(exp_text, cop_value):
     if not exp_text:
         return False
