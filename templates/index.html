@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEET PG Mega</title>
     <style>
         * {
@@ -14,23 +15,288 @@
 
         body {
             display: flex;
-            height: 100vh;
+            flex-wrap: wrap;
+            min-height: 100vh;
             background: #f8fafc;
-            overflow: hidden;
-        }
-
-        body.dark {
-            background: #0f172a;
-            color: #fff;
+            overflow-x: hidden;
         }
 
         .main {
-            flex: 1;
+            flex: 1 1 0;
             overflow-y: auto;
             padding: 1rem;
             max-width: 800px;
             margin: 0 auto;
+            min-width: 0;
         }
+
+        .side {
+            width: 300px;
+            max-width: 100%;
+            background: #fff;
+            border-left: 1px solid #ccc;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body.dark .side {
+            background: #1e293b;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(48px, 1fr));
+            gap: 0.3rem;
+            margin: 1rem 0;
+        }
+
+        .item {
+            aspect-ratio: 1;
+            background: #eee;
+            border: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border-radius: 4px;
+            position: relative;
+            min-height: 48px;
+        }
+
+        body.dark .item {
+            background: #334155;
+            color: #fff;
+        }
+
+        .item.ans {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .item.star::after {
+            content: "⭐";
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 0.5rem;
+        }
+
+        .item.rev {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .item.ok {
+            background: #16a34a !important;
+            color: #fff;
+        }
+
+        .item.no {
+            background: #dc2626 !important;
+            color: #fff;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+        }
+
+        body.dark .card {
+            background: #1e293b;
+        }
+
+        .lbl {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            margin: 0.3rem 0;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .lbl.strike {
+            text-decoration: line-through;
+            opacity: 0.4;
+        }
+
+        .good {
+            background: #f0fdf4 !important;
+            border-color: #16a34a !important;
+            color: #16a34a;
+            font-weight: 700;
+        }
+
+        .exp {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background: #f1f5f9;
+            border-left: 4px solid #2563eb;
+            display: none;
+            font-size: 0.85rem;
+        }
+
+        body.dark .exp {
+            background: #475569;
+        }
+
+        .pad {
+            width: 100%;
+            height: 40px;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .btn {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            width: 100%;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .sub-btn {
+            background: #0f172a;
+            margin-top: auto;
+        }
+
+        .mdl {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .mdl.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .mdl-c {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 400px;
+            color: #000;
+            width: min(92vw, 420px);
+            box-sizing: border-box;
+        }
+
+        .top-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .top-row input {
+            flex: 1 1 220px;
+            min-width: 160px;
+            padding: 0.5rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            color: #2563eb;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-header .actions {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        .card-header button {
+            padding: 0.35rem 0.6rem;
+            font-size: 0.8rem;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 1024px) {
+            .side {
+                width: 100%;
+                border-left: none;
+                border-top: 1px solid #ccc;
+                min-height: auto;
+                height: auto;
+            }
+
+            .main {
+                padding: 1rem;
+            }
+
+            .grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+        @media (max-width: 720px) {
+            .grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 0.5rem;
+            }
+
+            .top-row {
+                gap: 0.5rem;
+            }
+
+            .card-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .card-header .actions {
+                width: 100%;
+            }
+
+            .pad {
+                height: 44px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .main {
+                padding: 0.75rem;
+            }
+
+            .btn {
+                padding: 0.65rem;
+            }
+        }
+    </style>
+</head>
 
         .side {
             width: 300px;
@@ -201,28 +467,27 @@
 
 <body>
     <div class="main" id="box">
-        <div style="display:flex; justify-content:space-between; margin-bottom:1rem; align-items:center;">
-            <h2>NEET PG Simulator</h2><input type="text" id="srch" placeholder="🔍 Search text..." onkeyup="find()"
-                style="padding:0.3rem;">
+        <div class="top-row">
+            <h2>NEET PG Simulator</h2>
+            <input type="text" id="srch" placeholder="🔍 Search text..." onkeyup="find()">
             <h3 id="clock" style="background:#fef3c7; color:#b45309; padding:0.3rem; border-radius:4px;">03:30:00</h3>
         </div>
         <form id="qForm">{% for q in qs %}<div class="card" id="b-{{ loop.index }}">
-                <div
-                    style="display:flex; justify-content:space-between; font-size:0.8rem; color:#2563eb; margin-bottom:0.5rem;">
+                <div class="card-header">
                     <strong>Question {{ loop.index }} of 180 (Medicine)</strong>
-                    <div><button type="button" onclick="flag({{ loop.index }}, 'star')">⭐ Star</button><button
+                    <div class="actions"><button type="button" onclick="flag({{ loop.index }}, 'star')">⭐ Star</button><button
                             type="button" onclick="flag({{ loop.index }}, 'rev')">🕒 Review</button><button
                             type="button" onclick="strike({{ loop.index }})">❌ Strike</button><button type="button"
                             onclick="clr({{ loop.index }})">🔄 Clear</button></div>
                 </div>
                 <p class="txt" style="font-weight:600; margin-bottom:0.5rem;">{{ q.q }}</p>
                 <div class="opts" data-cor="{{ q.cor }}"><label class="lbl"><input type="radio" name="g_{{ q.id }}"
-                            value="A" onchange="chk({{ loop.index }})">&nbsp;A: {{ q.a }}</label><label
+                            value="A" onchange="chk({{ loop.index }}, '{{ q.id }}')">&nbsp;A: {{ q.a }}</label><label
                         class="lbl"><input type="radio" name="g_{{ q.id }}" value="B"
-                            onchange="chk({{ loop.index }})">&nbsp;B: {{ q.b }}</label><label class="lbl"><input
-                            type="radio" name="g_{{ q.id }}" value="C" onchange="chk({{ loop.index }})">&nbsp;C: {{ q.c
+                            onchange="chk({{ loop.index }}, '{{ q.id }}')">&nbsp;B: {{ q.b }}</label><label class="lbl"><input
+                            type="radio" name="g_{{ q.id }}" value="C" onchange="chk({{ loop.index }}, '{{ q.id }}')">&nbsp;C: {{ q.c
                         }}</label><label class="lbl"><input type="radio" name="g_{{ q.id }}" value="D"
-                            onchange="chk({{ loop.index }})">&nbsp;D: {{ q.d }}</label></div><textarea class="pad"
+                            onchange="chk({{ loop.index }}, '{{ q.id }}')">&nbsp;D: {{ q.d }}</label></div><textarea class="pad"
                     placeholder=" Type scratchpad notes..."></textarea>
                 <div class="exp" id="e-{{ loop.index }}"><strong>Rationale:</strong> {{ q.ex }}</div>
             </div>{% endfor %}</form>
@@ -248,7 +513,7 @@
     <footer style="text-align: center; margin-top: 50px; font-size: 0.8rem; color: #888;">
         <p>Created by Dr.Shreya MBBS</p>
     </footer>
-    <script>let sec = 210 * 60; window.addEventListener("beforeunload", (e) => { e.preventDefault(); e.returnValue = ""; }); const clock = setInterval(() => { sec--; let h = String(Math.floor(sec / 3600)).padStart(2, "0"), m = String(Math.floor((sec % 3600) / 60)).padStart(2, "0"), s = String(sec % 60).padStart(2, "0"); document.getElementById("clock").innerText = h + ":" + m + ":" + s; if (sec <= 0) { clearInterval(clock); score(true); } }, 1000); function go(i) { document.getElementById("b-" + i).scrollIntoView({ behavior: "smooth", block: "center" }); } function chk(i) { document.getElementById("n-" + i).classList.add("ans"); } function flag(i, c) { document.getElementById("n-" + i).classList.toggle(c); } function clr(i) { document.getElementById("b-" + i).querySelectorAll("input").forEach(r => r.checked = false); document.getElementById("n-" + i).classList.remove("ans"); } function strike(i) { alert("Tip: Hold Shift or Alt and click an option line to cross it out!"); document.getElementById("b-" + i).querySelectorAll(".lbl").forEach(l => l.onclick = (e) => { if (e.altKey || e.shiftKey) l.classList.toggle("strike"); }); } function calc() { alert("Medical Formulas:\n• BMI = kg/m²\n• Anion Gap = Na - (Cl + HCO3)"); } function find() { let t = document.getElementById("srch").value.toLowerCase(); document.querySelectorAll(".card").forEach(c => c.style.style.display = c.querySelector(".txt").innerText.toLowerCase().includes(t) ? "block" : "none"); } function score(auto) { if (!auto && !confirm("Submit active exam?")) return; clearInterval(clock); let ok = 0, no = 0; for (let i = 1; i <= 180; i++) { let b = document.getElementById("b-" + i), o = b.querySelector(".opts"), c = o.getAttribute("data-cor"), s = o.querySelector("input:checked"), n = document.getElementById("n-" + i); document.getElementById("e-" + i).style.display = "block"; o.querySelectorAll(".lbl").forEach(l => { if (l.innerText.trim().startsWith(c)) l.classList.add("good"); }); if (s) { if (s.value === c) { ok++; n.className = "item ok"; } else { no++; n.className = "item no"; } } else { n.className = "item no"; } } let total = (ok * 4) - (no * 1); document.getElementById("fSc").innerText = total + " / 720"; document.getElementById("rank").innerText = total >= 400 ? "🏆 Pass (Top 10% Rank)" : "⚠️ Target 60% Percentile Next Time"; let h = JSON.parse(localStorage.getItem("n_h") || "[]"); h.push({ d: new Date().toLocaleDateString(), s: total }); localStorage.setItem("n_h", JSON.stringify(h)); showH(); document.getElementById("m").classList.add("active"); document.getElementById("box").scrollTop = 0; } function showH() { let h = JSON.parse(localStorage.getItem("n_h") || "[]"); document.getElementById("logs").innerHTML = h.map((x, i) => "<div>Run #" + (i + 1) + ": <strong>" + x.s + "/720</strong> (" + x.d + ")</div>").reverse().join(""); } document.addEventListener("DOMContentLoaded", showH);</script>
+    <script>let sec = 210 * 60; window.addEventListener("beforeunload", (e) => { e.preventDefault(); e.returnValue = ""; }); const clock = setInterval(() => { sec--; let h = String(Math.floor(sec / 3600)).padStart(2, "0"), m = String(Math.floor((sec % 3600) / 60)).padStart(2, "0"), s = String(sec % 60).padStart(2, "0"); document.getElementById("clock").innerText = h + ":" + m + ":" + s; if (sec <= 0) { clearInterval(clock); score(true); } }, 1000); function go(i) { document.getElementById("b-" + i).scrollIntoView({ behavior: "smooth", block: "center" }); } async function chk(i, q_id) { document.getElementById("n-" + i).classList.add("ans"); await fetch('/save-progress', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({question_id: q_id})}); } function flag(i, c) { document.getElementById("n-" + i).classList.toggle(c); } function clr(i) { document.getElementById("b-" + i).querySelectorAll("input").forEach(r => r.checked = false); document.getElementById("n-" + i).classList.remove("ans"); } function strike(i) { alert("Tip: Hold Shift or Alt and click an option line to cross it out!"); document.getElementById("b-" + i).querySelectorAll(".lbl").forEach(l => l.onclick = (e) => { if (e.altKey || e.shiftKey) l.classList.toggle("strike"); }); } function calc() { alert("Medical Formulas:\n• BMI = kg/m²\n• Anion Gap = Na - (Cl + HCO3)"); } function find() { let t = document.getElementById("srch").value.toLowerCase(); document.querySelectorAll(".card").forEach(c => c.style.style.display = c.querySelector(".txt").innerText.toLowerCase().includes(t) ? "block" : "none"); } function score(auto) { if (!auto && !confirm("Submit active exam?")) return; clearInterval(clock); let ok = 0, no = 0; for (let i = 1; i <= 180; i++) { let b = document.getElementById("b-" + i), o = b.querySelector(".opts"), c = o.getAttribute("data-cor"), s = o.querySelector("input:checked"), n = document.getElementById("n-" + i); document.getElementById("e-" + i).style.display = "block"; o.querySelectorAll(".lbl").forEach(l => { if (l.innerText.trim().startsWith(c)) l.classList.add("good"); }); if (s) { if (s.value === c) { ok++; n.className = "item ok"; } else { no++; n.className = "item no"; } } else { n.className = "item no"; } } let total = (ok * 4) - (no * 1); document.getElementById("fSc").innerText = total + " / 720"; document.getElementById("rank").innerText = total >= 400 ? "🏆 Pass (Top 10% Rank)" : "⚠️ Target 60% Percentile Next Time"; let h = JSON.parse(localStorage.getItem("n_h") || "[]"); h.push({ d: new Date().toLocaleDateString(), s: total }); localStorage.setItem("n_h", JSON.stringify(h)); showH(); document.getElementById("m").classList.add("active"); document.getElementById("box").scrollTop = 0; } function showH() { let h = JSON.parse(localStorage.getItem("n_h") || "[]"); document.getElementById("logs").innerHTML = h.map((x, i) => "<div>Run #" + (i + 1) + ": <strong>" + x.s + "/720</strong> (" + x.d + ")</div>").reverse().join(""); } document.addEventListener("DOMContentLoaded", showH);</script>
 </body>
 
 </html>
