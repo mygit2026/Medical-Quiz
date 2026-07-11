@@ -149,7 +149,23 @@ def save_score():
 @app.route('/')
 def index():
     # Fetch questions from Supabase (raise if missing or failing)
-    questions = fetch_questions_from_supabase(limit=1000)
+    try:
+        questions = fetch_questions_from_supabase(limit=1000)
+    except Exception as exc:
+        error_message = html.escape(str(exc))
+        return render_template_string(
+            """
+            <html><body style='font-family:system-ui, sans-serif; padding:32px; background:#f8fafc; color:#111827;'>
+            <h1 style='color:#b91c1c;'>Supabase load error</h1>
+            <p>The app could not load questions from Supabase.</p>
+            <pre style='background:#ffffff; border:1px solid #e2e8f0; padding:16px; border-radius:12px; overflow-x:auto;'>{{ msg }}</pre>
+            <p>Please set <strong>SUPABASE_KEY</strong> in Render to the Supabase <strong>secret</strong> key (sb_secret_...).</p>
+            <p>If you only have a publishable key, create/update the Renderrenvironemnt variable to use the secret key.</p>
+            </body></html>
+            """,
+            msg=error_message
+        ), 500
+
     if not questions:
         return "No questions returned from Supabase. Check SUPABASE_URL/SUPABASE_KEY and that `questions` table has rows.", 500
 
