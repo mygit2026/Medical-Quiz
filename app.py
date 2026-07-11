@@ -213,7 +213,7 @@ def index():
                 </div>
                 <div id='exp-{q_num}' class='explanation-box'>
                     <strong>Explanation:</strong> 
-                    <button onclick="playTTS('{html.escape(exp_text)}')">🔊 Read Aloud</button>
+                    <button onclick='playTTS({json.dumps(exp_text)})'>🔊 Read Aloud</button>
                     <button onclick='stopTTS()'>⏹ Stop</button>
                     <p>{exp_text}</p>
                 </div>
