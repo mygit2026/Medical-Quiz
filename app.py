@@ -5,7 +5,10 @@ from threading import Timer
 import webbrowser, html
 
 app = Flask(__name__)
-DF = pd.read_parquet("train-00000-of-00001.parquet")
+# This finds the file in the same folder no matter what
+base_path = os.path.dirname(os.path.abspath(__file__))
+file_path = os.path.join(base_path, "train-00000-of-00001.parquet")
+DF = pd.read_parquet(file_path)
 HISTORY_FILE = "exam_history.json"
 
 def open_browser(): webbrowser.open_new("http://127.0.0.1:5000")
@@ -180,4 +183,4 @@ TEMPLATE = """
 
 if __name__ == '__main__':
     Timer(1, open_browser).start()
-    app.run(debug=True)
+    app.run()
