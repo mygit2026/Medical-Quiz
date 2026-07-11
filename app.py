@@ -3,7 +3,18 @@ import pandas as pd
 import random, json, os, datetime, re
 from threading import Timer
 import webbrowser, html
-import psycopg2
+try:
+    import psycopg2 as _psycopg
+    _db_driver = 'psycopg2'
+except Exception:
+    _psycopg = None
+    try:
+        import psycopg as _psycopg3
+        _psycopg = _psycopg3
+        _db_driver = 'psycopg'
+    except Exception:
+        _psycopg = None
+        _db_driver = None
 from dotenv import load_dotenv
 
 # Load environment variables for the database
@@ -39,7 +50,9 @@ HISTORY_FILE = "exam_history.json"
 # Database Connection Helper
 def get_db_connection():
     # Make sure DATABASE_URL is set in your .env file
-    return psycopg2.connect(os.environ.get("DATABASE_URL"))
+    if not _psycopg:
+        raise RuntimeError("No PostgreSQL driver available (psycopg2 or psycopg). DB features disabled.")
+    return _psycopg.connect(os.environ.get("DATABASE_URL"))
 
 def is_conflicting_explanation(exp_text, cop_value):
     if not exp_text:
