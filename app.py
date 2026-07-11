@@ -76,13 +76,18 @@ def fetch_questions_from_supabase(limit=500):
 
     # Ensure URL does not end with a slash
     url = url.rstrip('/')
-    endpoint = f"{url}/rest/v1/questions?select=*&limit={limit}"
+    endpoint = f"{url}/rest/v1/questions"
+    params = {
+        'select': '*',
+        'choice_type': 'eq.single',
+        'limit': limit,
+    }
     headers = {
         'apikey': key,
         'Authorization': f'Bearer {key}',
         'Accept': 'application/json'
     }
-    resp = requests.get(endpoint, headers=headers, timeout=15)
+    resp = requests.get(endpoint, headers=headers, params=params, timeout=15)
     # Log status and number of items to help diagnose RLS/permission issues in hosted logs
     try:
         data = resp.json()
@@ -414,7 +419,10 @@ TEMPLATE = """
             <div class='question-panel'>
                 <div style='display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;'>
                     <strong style='color:#0f172a;'>Question Palette</strong>
-                    <button class='submit-fixed' style='padding:10px 14px; font-size:0.92rem;' onclick='prepareReviewSummary()'>Review</button>
+                    <div style='display:flex; gap:8px; flex-wrap:wrap;'>
+                        <button class='submit-fixed' style='padding:10px 14px; font-size:0.92rem;' onclick='loadNewSet()'>New Set</button>
+                        <button class='submit-fixed' style='padding:10px 14px; font-size:0.92rem;' onclick='prepareReviewSummary()'>Review</button>
+                    </div>
                 </div>
                 <div class='nav-grid'>{{ grid | safe }}</div>
                 <div class='submit-panel'>
@@ -726,6 +734,11 @@ TEMPLATE = """
                 chip.textContent = 'Unvisited';
                 chip.className = 'status-chip status-unanswered';
             }
+        }
+
+        function loadNewSet() {
+            localStorage.removeItem('pgneet_exam_state');
+            window.location.href = '/?fresh=' + Date.now();
         }
 
         function prepareReviewSummary() {
