@@ -199,6 +199,12 @@ def index():
         correct_answers[f"q{q_num}"] = c
         topic = r.get('topic', 'General')
         exp_text = str(r.get('exp', 'No explanation provided.'))
+        safe_question = html.escape(str(r.get('question', '')))
+        safe_exp_text = html.escape(exp_text, quote=True)
+        safe_opa = html.escape(str(r.get('opa', '')))
+        safe_opb = html.escape(str(r.get('opb', '')))
+        safe_opc = html.escape(str(r.get('opc', '')))
+        safe_opd = html.escape(str(r.get('opd', '')))
 
         qs.append(f"""
             <div id='card-{q_num}' class='marrow-target-card'>
@@ -209,18 +215,18 @@ def index():
                         <button class='flag-btn' onclick='toggleFlag({q_num})' id='f-{q_num}'>⚑ Flag</button>
                     </div>
                 </div>
-                <p class='q-text'>{r.get('question')}</p>
+                <p class='q-text'>{safe_question}</p>
                 <div class='opts-box'>
-                    <label id='l-{q_num}-A' class='radio-label'><input type='radio' name='n{q_num}' value='A' onchange='mark({q_num})'> A: {r.get('opa')}</label>
-                    <label id='l-{q_num}-B' class='radio-label'><input type='radio' name='n{q_num}' value='B' onchange='mark({q_num})'> B: {r.get('opb')}</label>
-                    <label id='l-{q_num}-C' class='radio-label'><input type='radio' name='n{q_num}' value='C' onchange='mark({q_num})'> C: {r.get('opc')}</label>
-                    <label id='l-{q_num}-D' class='radio-label'><input type='radio' name='n{q_num}' value='D' onchange='mark({q_num})'> D: {r.get('opd')}</label>
+                    <label id='l-{q_num}-A' class='radio-label'><input type='radio' name='n{q_num}' value='A' onchange='mark({q_num})'> A: {safe_opa}</label>
+                    <label id='l-{q_num}-B' class='radio-label'><input type='radio' name='n{q_num}' value='B' onchange='mark({q_num})'> B: {safe_opb}</label>
+                    <label id='l-{q_num}-C' class='radio-label'><input type='radio' name='n{q_num}' value='C' onchange='mark({q_num})'> C: {safe_opc}</label>
+                    <label id='l-{q_num}-D' class='radio-label'><input type='radio' name='n{q_num}' value='D' onchange='mark({q_num})'> D: {safe_opd}</label>
                 </div>
                 <div id='exp-{q_num}' class='explanation-box'>
                     <strong>Explanation:</strong> 
-                    <button onclick='playTTS({json.dumps(exp_text)})'>🔊 Read Aloud</button>
-                    <button onclick='stopTTS()'>⏹ Stop</button>
-                    <p>{exp_text}</p>
+                    <button type='button' onclick="playTTS(this.getAttribute('data-text'))" data-text='{safe_exp_text}'>🔊 Read Aloud</button>
+                    <button type='button' onclick='stopTTS()'>⏹ Stop</button>
+                    <p>{safe_exp_text}</p>
                 </div>
             </div>""")
     
@@ -608,8 +614,16 @@ TEMPLATE = """
         function calcAdd(v) { document.getElementById('calc-display').value += v; }
         function calcClear() { document.getElementById('calc-display').value = ''; }
         function calcSolve() { try { document.getElementById('calc-display').value = eval(document.getElementById('calc-display').value); } catch { document.getElementById('calc-display').value = 'Error'; } }
-        function playTTS(txt) { window.speechSynthesis.cancel(); window.speechSynthesis.speak(new SpeechSynthesisUtterance(txt)); }
-        function stopTTS() { window.speechSynthesis.cancel(); }
+        function playTTS(txt) {
+            if (!window.speechSynthesis || !txt) return;
+            const utterance = new SpeechSynthesisUtterance(String(txt));
+            utterance.lang = 'en-US';
+            utterance.rate = 1;
+            utterance.pitch = 1;
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utterance);
+        }
+        function stopTTS() { if (window.speechSynthesis) window.speechSynthesis.cancel(); }
 
         function toggleFlag(i) {
             const flagBtn = document.getElementById('f-' + i);
