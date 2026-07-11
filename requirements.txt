@@ -1,6 +1,5 @@
-flask
-pandas
-pyarrow
-gunicorn
-python-dotenv
-psycopg2-binary
+Flask==2.2.5
+pandas==2.2.3
+gunicorn==20.1.0
+python-dotenv==1.0.0
+psycopg2-binary==2.9.6
