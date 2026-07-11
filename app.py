@@ -1,5 +1,4 @@
 from flask import Flask, render_template_string, jsonify, request
-import pandas as pd
 import random, json, os, datetime, re
 from threading import Timer
 import webbrowser, html
@@ -27,10 +26,11 @@ base_path = os.path.dirname(os.path.abspath(__file__))
 parquet_path = os.path.join(base_path, "train-00000-of-00001.parquet")
 csv_path = os.path.join(base_path, "train.csv")
 
-# Load dataframe with fallback: try parquet first (if pyarrow installed), else fall back to CSV.
+# Load dataframe with fallback: import pandas lazily to avoid import-time DB/extension issues.
 DF = None
 if os.path.exists(parquet_path):
     try:
+        import pandas as pd
         DF = pd.read_parquet(parquet_path)
     except Exception as e:
         print(f"Warning: failed to read parquet ({parquet_path}): {e}")
@@ -38,6 +38,7 @@ if os.path.exists(parquet_path):
 if DF is None:
     if os.path.exists(csv_path):
         try:
+            import pandas as pd
             DF = pd.read_csv(csv_path)
         except Exception as e:
             print(f"Error: failed to read fallback CSV ({csv_path}): {e}")
