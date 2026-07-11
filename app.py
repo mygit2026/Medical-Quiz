@@ -25,6 +25,7 @@ app = Flask(__name__)
 base_path = os.path.dirname(os.path.abspath(__file__))
 parquet_path = os.path.join(base_path, "train-00000-of-00001.parquet")
 csv_path = os.path.join(base_path, "train.csv")
+questions_csv_path = os.path.join(base_path, "questions.csv")
 
 # Load dataframe with fallback: import pandas lazily to avoid import-time DB/extension issues.
 DF = None
@@ -42,6 +43,13 @@ if DF is None:
             DF = pd.read_csv(csv_path)
         except Exception as e:
             print(f"Error: failed to read fallback CSV ({csv_path}): {e}")
+            DF = pd.DataFrame()
+    elif os.path.exists(questions_csv_path):
+        try:
+            import pandas as pd
+            DF = pd.read_csv(questions_csv_path)
+        except Exception as e:
+            print(f"Error: failed to read fallback questions CSV ({questions_csv_path}): {e}")
             DF = pd.DataFrame()
     else:
         print("Warning: no parquet or CSV dataset found; starting with empty DataFrame.")
