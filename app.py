@@ -15,6 +15,7 @@ except Exception:
         _psycopg = None
         _db_driver = None
 from dotenv import load_dotenv
+import requests
 
 # Load environment variables for the database
 load_dotenv()
@@ -63,6 +64,27 @@ def get_db_connection():
         raise RuntimeError("No PostgreSQL driver available (psycopg2 or psycopg). DB features disabled.")
     return _psycopg.connect(os.environ.get("DATABASE_URL"))
 
+
+def fetch_questions_from_supabase(limit=500):
+    """Fetch questions from Supabase REST API. Returns list of dicts."""
+    url = os.environ.get('SUPABASE_URL')
+    key = os.environ.get('SUPABASE_KEY')
+    if not url or not key:
+        raise RuntimeError('SUPABASE_URL and SUPABASE_KEY must be set in environment')
+
+    # Ensure URL does not end with a slash
+    url = url.rstrip('/')
+    endpoint = f"{url}/rest/v1/questions?select=*&limit={limit}"
+    headers = {
+        'apikey': key,
+        'Authorization': f'Bearer {key}',
+        'Accept': 'application/json'
+    }
+    resp = requests.get(endpoint, headers=headers, timeout=15)
+    if resp.status_code != 200:
+        raise RuntimeError(f"Supabase request failed: {resp.status_code} {resp.text}")
+    return resp.json()
+
 def is_conflicting_explanation(exp_text, cop_value):
     if not exp_text:
         return False
@@ -93,19 +115,37 @@ def save_score():
 
 @app.route('/')
 def index():
-    valid_df = DF[~DF.apply(lambda r: is_conflicting_explanation(r.get('exp', ''), r.get('cop', 1)), axis=1)]
-    if len(valid_df) < 180:
-        valid_df = DF
-    pdf = valid_df.iloc[random.sample(range(len(valid_df)), min(180, len(valid_df)))]
+    # Fetch questions from Supabase (raise if missing or failing)
+    questions = fetch_questions_from_supabase(limit=1000)
+    if not questions:
+        return "No questions returned from Supabase. Check SUPABASE_URL/SUPABASE_KEY and that `questions` table has rows.", 500
+
+    # Filter out conflicting explanations similar to previous logic
+    filtered = []
+    for r in questions:
+        try:
+            if is_conflicting_explanation(r.get('exp', ''), r.get('cop', 1)):
+                continue
+        except Exception:
+            pass
+        filtered.append(r)
+
+    if len(filtered) < 180:
+        chosen = filtered
+    else:
+        chosen = random.sample(filtered, 180)
+
     qs, correct_answers = [], {}
-    
-    for idx, r in pdf.iterrows():
+    for idx, r in enumerate(chosen):
         q_num = len(qs) + 1
-        c = {1:'A', 2:'B', 3:'C', 4:'D'}.get(int(r.get('cop', 1)), 'A')
+        try:
+            c = {1:'A', 2:'B', 3:'C', 4:'D'}.get(int(r.get('cop', 1)), 'A')
+        except Exception:
+            c = 'A'
         correct_answers[f"q{q_num}"] = c
         topic = r.get('topic', 'General')
         exp_text = str(r.get('exp', 'No explanation provided.'))
-        
+
         qs.append(f"""
             <div id='card-{q_num}' class='marrow-target-card'>
                 <div class='q-header'>
