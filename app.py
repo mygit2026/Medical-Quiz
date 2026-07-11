@@ -402,7 +402,7 @@ TEMPLATE = """
                 <p class='app-subtitle'>Designed for Dr. Shreya MBBS</p>
                 <div class='topbar'>
                     <div class='header-meta'>
-                        <strong>Live exam cockpit</strong>
+                        <strong>Exam simulator</strong>
                         <span class='hint'>Use filters, jump controls and quick status preview</span>
                     </div>
                     <button class='theme-toggle' onclick='toggleTheme()' id='theme-toggle'>Dark mode</button>
